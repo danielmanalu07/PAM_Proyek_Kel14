@@ -1,0 +1,160 @@
+import 'dart:convert';
+
+import 'package:cis/constants/constants.dart';
+import 'package:cis/fetchdata/mahasiswas.dart';
+import 'package:cis/views/Admin/screens/homeadmin_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:cis/fetchdata/izinkeluar.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' as http;
+
+class ApproveIKPage extends StatefulWidget {
+  const ApproveIKPage({super.key});
+
+  @override
+  State<ApproveIKPage> createState() => _ApproveIKPageState();
+}
+
+class _ApproveIKPageState extends State<ApproveIKPage> {
+  List<IzinKeluar> izinKeluars = [];
+  MahasiswaData? data;
+
+  final box = GetStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDataIzinKeluar();
+  }
+
+  Future<void> updateStatus(int id, int status) async {
+    try {
+      String? authToken = box.read('token');
+      print('Authorization Token: $authToken');
+
+      var response = await http.put(
+        Uri.parse(admin + 'izin-keluars/$id'),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'status': status}),
+      );
+
+      print('Response: ${response.statusCode} - ${response.body}');
+
+      if (response.statusCode == 200) {
+        fetchDataIzinKeluar();
+      } else {
+        throw Exception('Failed to update status');
+      }
+    } catch (error) {
+      print('Error: $error');
+      throw Exception('Failed to update status: $error');
+    }
+  }
+
+  Future<void> fetchDataIzinKeluar() async {
+    try {
+      String? authToken = box.read('token');
+      var response = await http.get(
+        Uri.parse(admin + 'getik'),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          izinKeluars = data.map((item) => IzinKeluar.fromJson(item)).toList();
+        });
+      } else {
+        throw Exception('Failed to load izin keluar data');
+      }
+    } catch (error) {
+      throw Exception('Failed to load izin keluar data: $error');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text('Izin Keluar Page'),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              Get.to(() => HomeAdmin());
+            },
+            child: Text('Kembali'),
+          ),
+          SizedBox(
+            height: 16,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columnSpacing: 16.0,
+                columns: [
+                  DataColumn(label: Text('Rencana Berangkat')),
+                  DataColumn(label: Text('Rencana Kembali')),
+                  DataColumn(label: Text('Keperluan')),
+                  DataColumn(label: Text('Status')),
+                  DataColumn(label: Text('Actions')),
+                ],
+                rows: izinKeluars.map((izin) {
+                  return DataRow(
+                    cells: [
+                      DataCell(Text(izin.rencanaBerangkat)),
+                      DataCell(Text(izin.rencanaKembali)),
+                      DataCell(Text(izin.keperluan)),
+                      DataCell(Text(getStatusText(izin.status))),
+                      DataCell(Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              updateStatus(izin.id, 1);
+                            },
+                            child: Text('Setuju'),
+                          ),
+                          SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () {
+                              updateStatus(izin.id, 2);
+                            },
+                            child: Text('Tolak'),
+                          ),
+                        ],
+                      )),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String getStatusText(int status) {
+    switch (status) {
+      case 0:
+        return 'Pending';
+      case 1:
+        return 'Disetujui';
+      case 2:
+        return 'Ditolak';
+      default:
+        return 'Unknown';
+    }
+  }
+}
