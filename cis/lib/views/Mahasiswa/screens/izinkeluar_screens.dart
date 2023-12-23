@@ -31,7 +31,7 @@ class _IzinKeluarPageState extends State<IzinKeluarPage> {
     try {
       String? authToken = box.read('token');
       var response = await http.get(
-        Uri.parse('${user}izin-keluars'),
+        Uri.parse(user + 'izin-keluars'),
         headers: {
           'Authorization': 'Bearer $authToken',
         },

@@ -1,5 +1,3 @@
-import 'package:cis/views/Admin/screens/loginadmin_screen.dart';
-import 'package:cis/views/Mahasiswa/screens/login_screens.dart';
 import 'package:cis/views/splash_screen.dart';
 // import 'package:cis/views/Mahasiswa/screens/login_screens.dart';
 // import 'package:cis/views/Mahasiswa/screens/register_screens.dart';

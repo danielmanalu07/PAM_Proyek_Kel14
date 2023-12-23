@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Mahasiswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mahasiswa;
+use App\Models\Ruangan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -69,6 +70,13 @@ class MahasiswaController extends Controller
         return response([
             'mahasiswa' => auth()->user(),
         ], 200);
+    }
+
+    public function getRuangan()
+    {
+        $ruangan = Ruangan::all();
+
+        return response()->json($ruangan, 200);
     }
 
 }

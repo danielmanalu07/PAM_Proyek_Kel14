@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:cis/constants/constants.dart';
 import 'package:cis/controllers/Mahasiswa/MahasiswaController.dart';
 import 'package:cis/fetchdata/mahasiswas.dart';
+import 'package:cis/views/Mahasiswa/screens/booking_ruangan_screen.dart';
+import 'package:cis/views/Mahasiswa/screens/izinbermalam_screen.dart';
 import 'package:cis/views/Mahasiswa/screens/izinkeluar_screens.dart';
+import 'package:cis/views/Mahasiswa/screens/surat_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -94,14 +97,14 @@ class _HomePageState extends State<HomePage> {
                 crossAxisSpacing: 8.0,
                 mainAxisSpacing: 8.0,
               ),
-              itemCount: 4,
+              itemCount: 5,
               itemBuilder: (context, index) {
                 List<Map<String, dynamic>> cardData = [
                   {
                     'title': 'Request Surat',
                     'icon': Icons.mail,
                     'color': Colors.blue,
-                    'page': null,
+                    'page': SuratPage(),
                   },
                   {
                     'title': 'Izin Keluar',
@@ -113,13 +116,19 @@ class _HomePageState extends State<HomePage> {
                     'title': 'Izin Bermalam',
                     'icon': Icons.hotel,
                     'color': Colors.orange,
-                    'page': null,
+                    'page': IzinBermalamPage(),
                   },
                   {
                     'title': 'Pembelian Kaos',
                     'icon': Icons.shopping_cart,
                     'color': Colors.purple,
                     'page': null,
+                  },
+                  {
+                    'title': 'Booking Ruangan',
+                    'icon': Icons.window,
+                    'color': Colors.grey,
+                    'page': BookingRuanganPage(),
                   },
                 ];
                 return GestureDetector(

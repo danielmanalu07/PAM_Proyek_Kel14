@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:cis/constants/constants.dart';
 import 'package:cis/fetchdata/mahasiswas.dart';
-import 'package:cis/views/Admin/screens/homeadmin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cis/fetchdata/izinkeluar.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
@@ -18,14 +18,38 @@ class ApproveIKPage extends StatefulWidget {
 
 class _ApproveIKPageState extends State<ApproveIKPage> {
   List<IzinKeluar> izinKeluars = [];
-  MahasiswaData? data;
-
+  List<MahasiswaData> mahasiswaData = [];
   final box = GetStorage();
 
   @override
   void initState() {
     super.initState();
     fetchDataIzinKeluar();
+    fetchDataMahasiswa();
+  }
+
+  Future<void> fetchDataMahasiswa() async {
+    try {
+      String? authToken = box.read('token');
+      var response = await http.get(
+        Uri.parse(admin + 'getmhs'),
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> responseData = json.decode(response.body);
+        setState(() {
+          mahasiswaData =
+              responseData.map((item) => MahasiswaData.fromJson(item)).toList();
+        });
+      } else {
+        throw Exception('Failed to load mahasiswa data');
+      }
+    } catch (error) {
+      throw Exception('Failed to load mahasiswa data: $error');
+    }
   }
 
   Future<void> updateStatus(int id, int status) async {
@@ -84,26 +108,38 @@ class _ApproveIKPageState extends State<ApproveIKPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text('Izin Keluar Page'),
+        title: Row(
+          children: [
+            Text(
+              'Izin Keluar Page',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+            Spacer(),
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: Icon(
+                FontAwesomeIcons.arrowRightFromBracket,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.blueAccent,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ElevatedButton(
-            onPressed: () {
-              Get.to(() => HomeAdmin());
-            },
-            child: Text('Kembali'),
-          ),
-          SizedBox(
-            height: 16,
-          ),
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(
                 columnSpacing: 16.0,
                 columns: [
+                  DataColumn(label: Text('Mahasiswa')),
                   DataColumn(label: Text('Rencana Berangkat')),
                   DataColumn(label: Text('Rencana Kembali')),
                   DataColumn(label: Text('Keperluan')),
@@ -111,8 +147,12 @@ class _ApproveIKPageState extends State<ApproveIKPage> {
                   DataColumn(label: Text('Actions')),
                 ],
                 rows: izinKeluars.map((izin) {
+                  var mahasiswa = mahasiswaData.firstWhereOrNull(
+                    (m) => m.id?.toString() == izin.mahasiswaId.toString(),
+                  );
                   return DataRow(
                     cells: [
+                      DataCell(Text(mahasiswa?.nama ?? 'Unknown')),
                       DataCell(Text(izin.rencanaBerangkat)),
                       DataCell(Text(izin.rencanaKembali)),
                       DataCell(Text(izin.keperluan)),

@@ -3,7 +3,12 @@ import 'dart:convert';
 import 'package:cis/constants/constants.dart';
 import 'package:cis/controllers/Admin/AdminController.dart';
 import 'package:cis/fetchdata/admin.dart';
+import 'package:cis/views/Admin/screens/approve_ib.dart';
 import 'package:cis/views/Admin/screens/approve_ik.dart';
+import 'package:cis/views/Admin/screens/approve_ruangan_screen.dart';
+import 'package:cis/views/Admin/screens/approve_surat.dart';
+import 'package:cis/views/Admin/screens/kaos_screen.dart';
+import 'package:cis/views/Admin/screens/list_ruangan.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -92,13 +97,14 @@ class _HomeAdminState extends State<HomeAdmin> {
                 crossAxisSpacing: 8.0,
                 mainAxisSpacing: 8.0,
               ),
-              itemCount: 4,
+              itemCount: 6,
               itemBuilder: (context, index) {
                 List<Map<String, dynamic>> cardData = [
                   {
-                    'title': 'Request Surat',
+                    'title': 'Approve Surat',
                     'icon': Icons.email,
                     'color': Colors.blue,
+                    'page': ApproveSurat(),
                   },
                   {
                     'title': 'Izin Keluar Mahasiswa',
@@ -110,11 +116,25 @@ class _HomeAdminState extends State<HomeAdmin> {
                     'title': 'Izin Bermalam Mahasiswa',
                     'icon': Icons.hotel,
                     'color': Colors.orange,
+                    'page': ApproveIB(),
                   },
                   {
                     'title': 'Penjualan Kaos',
                     'icon': Icons.shopping_cart,
                     'color': Colors.purple,
+                    'page': KaosPage(),
+                  },
+                  {
+                    'title': 'Ruangan Kelas',
+                    'icon': Icons.window_outlined,
+                    'color': Colors.grey,
+                    'page': RuanganPage(),
+                  },
+                  {
+                    'title': 'Request Ruangan',
+                    'icon': Icons.door_back_door,
+                    'color': Colors.redAccent,
+                    'page': ApproveRuangan(),
                   },
                 ];
                 return GestureDetector(

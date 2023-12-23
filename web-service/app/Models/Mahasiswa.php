@@ -23,4 +23,9 @@ class Mahasiswa extends Model
     {
         return $this->hasMany(IzinKeluar::class, 'id');
     }
+
+    public function BookingRuangan()
+    {
+        return $this->hasMany(BookingRuangan::class, 'id');
+    }
 }

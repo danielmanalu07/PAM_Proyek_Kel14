@@ -12,6 +12,7 @@ class AdminController extends GetxController {
   final isLoading = false.obs;
   final token = ''.obs;
   final box = GetStorage();
+
   Future<void> login({
     required String email,
     required String password,
